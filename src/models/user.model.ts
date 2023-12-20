@@ -10,7 +10,7 @@ interface User extends Document {
 const userSchema: Schema = new Schema({
     lastName: { type: String, required: true },
     firstName: { type: String, required: true },
-    email: { type: String, required: true, unique: true }, // Email is unique
+    email: { type: String, required: true, unique: true, index: true }, // Email is unique
     password: { type: String, required: true }
 });
 
