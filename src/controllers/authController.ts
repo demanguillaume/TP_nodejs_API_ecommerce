@@ -4,7 +4,6 @@ import { sign } from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 import { config } from 'dotenv';
 import { hash } from 'bcrypt';
-import { validateUser } from '../utils/validationUtils';
 
 const prisma = new PrismaClient();
 
@@ -16,32 +15,8 @@ if (!jwtSecret) {
 }
 
 export const registerUser = async (req: Request, res: Response) => {
-    console.log('registerUser');
     try {
-        // Check if the request body is empty
-        if (!req.body) {
-            return res.status(400).json({ message: 'Request body is missing' });
-        }
-
         const { email, password, firstName, lastName } = req.body;
-
-        const validationError = validateUser({
-            email,
-            password,
-            firstName,
-            lastName,
-        });
-
-        if (validationError.isValid === false) {
-            return res.status(400).json({ message: validationError });
-        }
-
-        // Check if the user already exists
-        const user = await prisma.user.findUnique({ where: { email } });
-
-        if (user) {
-            return res.status(409).json({ message: 'User already exists' });
-        }
 
         // Hash the password
         const hashedPassword = await hash(password, 10);
@@ -61,6 +36,7 @@ export const registerUser = async (req: Request, res: Response) => {
 
         // Send the token in the response
         return res.status(201).json({ token });
+        
     } catch (error: any) {
         return res.status(500).json({ error: error.message || 'Internal Server Error' });
     }
@@ -69,11 +45,6 @@ export const registerUser = async (req: Request, res: Response) => {
 export const loginUser = async (req: Request, res: Response) => {
     try {
         const { email, password } = req.body;
-
-        // Check if the request body is empty
-        if (!email || !password) {
-            return res.status(400).json({ message: 'Email and password are required' });
-        }
 
         const user = await prisma.user.findUnique({ where: { email } });
 

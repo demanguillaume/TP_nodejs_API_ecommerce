@@ -1,28 +1,40 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import userRoute from './routes/userRoute';
 import authRoute from './routes/authRoute';
+import productRoute from './routes/productRoute';
+import orderRoute from './routes/orderRoute';
+
 import { errorMiddleware } from './middlewares/errorMiddleware';
 
 const app = express();
 
-// Middleware pour autoriser les requêtes de tous les domaines (à ajuster en fonction de vos besoins)
+// Middleware to allow requests from all domains (adjust according to your needs)
 app.use(cors());
 
-// Middleware pour parser le corps des requêtes en JSON
+// Middleware to parse request bodies as JSON
 app.use(bodyParser.json());
 
-// Routes utilisateur
-console.log('app.ts - authRoute');
+// User routes
+app.use('/user', userRoute);
+
+// Auth routes
 app.use('/auth', authRoute);
 
-// Middleware de gestion des erreurs
+// Product routes
+app.use('/product', productRoute);
+
+// Order routes
+app.use('/order', orderRoute);
+
+// Error handling middleware
 app.use(errorMiddleware);
 
-// Port d'écoute de l'application
+// Application listening port
 const PORT = process.env.PORT || 3000;
 
-// Démarrer le serveur
+// Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
