@@ -1,26 +1,38 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import './utils/passport'; 
+import passport from 'passport';
+
+// ROUTES
 import userRoute from './routes/userRoute';
 import authRoute from './routes/authRoute';
 import productRoute from './routes/productRoute';
 import orderRoute from './routes/orderRoute';
 
+// MIDDLWARES
+import { isAuthenticated } from './middlewares/isAuthenticated';
 import { errorMiddleware } from './middlewares/errorMiddleware';
 
 const app = express();
 
-// Middleware to allow requests from all domains (adjust according to your needs)
-app.use(cors());
-
 // Middleware to parse request bodies as JSON
 app.use(bodyParser.json());
 
+// Middleware to allow requests from all domains (CORS)
+app.use(cors());
+
+// Initialize passport (authentication middleware)
+app.use(passport.initialize());
+
+// Authentication routes (not protected by the isAuthenticated middleware)
+app.use('/auth', authRoute);
+
+// Apply isAuthenticated middleware to all subsequent routes
+app.use(isAuthenticated);
+
 // User routes
 app.use('/user', userRoute);
-
-// Auth routes
-app.use('/auth', authRoute);
 
 // Product routes
 app.use('/product', productRoute);
@@ -28,7 +40,7 @@ app.use('/product', productRoute);
 // Order routes
 app.use('/order', orderRoute);
 
-// Error handling middleware
+// Error middleware
 app.use(errorMiddleware);
 
 // Application listening port

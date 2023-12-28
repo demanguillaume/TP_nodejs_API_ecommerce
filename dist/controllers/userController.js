@@ -16,7 +16,7 @@ const prisma = new client_1.PrismaClient();
 // POST /user
 const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { email, password, firstName, lastName } = req.body;
+        const { email, password, role, firstName, lastName } = req.body;
         // Hash the password
         const hashedPassword = yield (0, bcrypt_1.hash)(password, 10);
         // Create the user
@@ -24,6 +24,7 @@ const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             data: {
                 email,
                 password: hashedPassword,
+                role,
                 firstName,
                 lastName
             }

@@ -4,17 +4,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+const authorizeByRole_1 = require("../middlewares/authorizeByRole ");
 const orderController_1 = require("../controllers/orderController");
+const User_1 = require("../models/User");
 const router = express_1.default.Router();
-// POST /order
-router.post('/', orderController_1.createOrder);
-// GET /order
-router.get('/', orderController_1.getAllOrders);
-// GET /order/:id
-router.get('/:id', orderController_1.getOrderById);
-// PATCH /order/:id
-router.patch('/:id', orderController_1.updateOrderById);
-// DELETE /order/:id
-router.delete('/:id', orderController_1.deleteOrderById);
+// CREATE /order
+router.post('/', (0, authorizeByRole_1.authorizeByRole)([User_1.UserRole.USER, User_1.UserRole.MANAGER]), orderController_1.createOrder);
+// READ ALL /order
+router.get('/', (0, authorizeByRole_1.authorizeByRole)([User_1.UserRole.MANAGER]), orderController_1.getAllOrders);
+// READ BY ID /order/:id
+router.get('/:id', (0, authorizeByRole_1.authorizeByRole)([User_1.UserRole.USER, User_1.UserRole.MANAGER]), orderController_1.getOrderById);
+// UPDATE BY ID /order/:id
+router.patch('/:id', (0, authorizeByRole_1.authorizeByRole)([User_1.UserRole.USER, User_1.UserRole.MANAGER]), orderController_1.updateOrderById);
+// DELETE BY ID /order/:id
+router.delete('/:id', (0, authorizeByRole_1.authorizeByRole)([User_1.UserRole.USER, User_1.UserRole.MANAGER]), orderController_1.deleteOrderById);
 exports.default = router;
 //# sourceMappingURL=orderRoute.js.map

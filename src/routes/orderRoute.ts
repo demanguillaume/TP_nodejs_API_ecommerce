@@ -1,20 +1,22 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
+import { authorizeByRole  } from '../middlewares/authorizeByRole ';
 import { createOrder, getAllOrders, getOrderById, updateOrderById, deleteOrderById } from '../controllers/orderController';
+import { UserRole } from '../models/User';
 const router = express.Router();
 
-// POST /order
-router.post('/', createOrder);
+// CREATE /order
+router.post('/', authorizeByRole([UserRole.USER, UserRole.MANAGER]), createOrder);
 
-// GET /order
-router.get('/', getAllOrders);
+// READ ALL /order
+router.get('/', authorizeByRole([UserRole.MANAGER]), getAllOrders);
 
-// GET /order/:id
-router.get('/:id', getOrderById);
+// READ BY ID /order/:id
+router.get('/:id', authorizeByRole([UserRole.USER, UserRole.MANAGER]), getOrderById);
 
-// PATCH /order/:id
-router.patch('/:id', updateOrderById);
+// UPDATE BY ID /order/:id
+router.patch('/:id', authorizeByRole([UserRole.USER, UserRole.MANAGER]), updateOrderById);
 
-// DELETE /order/:id
-router.delete('/:id', deleteOrderById);
+// DELETE BY ID /order/:id
+router.delete('/:id', authorizeByRole([UserRole.USER, UserRole.MANAGER]), deleteOrderById);
 
 export default router;

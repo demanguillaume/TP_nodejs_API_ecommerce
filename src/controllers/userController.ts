@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 // POST /user
 export const createUser = async (req: Request, res: Response) => {
     try {
-        const { email, password, firstName, lastName } = req.body;
+        const { email, password, role, firstName, lastName } = req.body;
 
         // Hash the password
         const hashedPassword = await hash(password, 10);
@@ -17,6 +17,7 @@ export const createUser = async (req: Request, res: Response) => {
             data: {
                 email,
                 password: hashedPassword,
+                role,
                 firstName,
                 lastName
             }
