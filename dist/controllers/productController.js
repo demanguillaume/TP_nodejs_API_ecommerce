@@ -11,11 +11,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteProductById = exports.updateProductById = exports.getProductById = exports.getAllProducts = exports.createProduct = void 0;
 const client_1 = require("@prisma/client");
+const ResponseError_1 = require("../types/ResponseError");
 const prisma = new client_1.PrismaClient();
-// POST /product
-const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const createProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        // Create the product
         const product = yield prisma.product.create({
             data: {
                 name: req.body.name,
@@ -23,32 +22,33 @@ const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
                 description: req.body.description
             }
         });
-        // Return the created product
-        return res.status(201).json(product);
+        res.status(201);
+        res.locals.product = product;
+        next();
     }
     catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
+        next(new ResponseError_1.ResponseError(500, "Internal server error", error));
     }
 });
 exports.createProduct = createProduct;
-// GET /product
-const getAllProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getAllProducts = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const products = yield prisma.product.findMany();
         if (products.length === 0) {
-            return res.status(404).json({ message: "No products found" });
+            next(new ResponseError_1.ResponseError(404, "No products found"));
         }
-        return res.status(200).json(products);
+        else {
+            res.status(200);
+            res.locals.products = products;
+            next();
+        }
     }
     catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
+        next(new ResponseError_1.ResponseError(500, "Internal server error", error));
     }
 });
 exports.getAllProducts = getAllProducts;
-// GET /product/:id
-const getProductById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getProductById = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const productId = req.params.id;
     try {
         const product = yield prisma.product.findUnique({
@@ -57,18 +57,20 @@ const getProductById = (req, res) => __awaiter(void 0, void 0, void 0, function*
             }
         });
         if (!product) {
-            return res.status(404).json({ message: "Product not found" });
+            next(new ResponseError_1.ResponseError(404, "Product not found"));
         }
-        return res.status(200).json(product);
+        else {
+            res.status(200);
+            res.locals.product = product;
+            next();
+        }
     }
     catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
+        next(new ResponseError_1.ResponseError(500, "Internal server error", error));
     }
 });
 exports.getProductById = getProductById;
-// PATCH /product/:id
-const updateProductById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const updateProductById = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const productId = req.params.id;
     try {
         const product = yield prisma.product.update({
@@ -81,16 +83,16 @@ const updateProductById = (req, res) => __awaiter(void 0, void 0, void 0, functi
                 description: req.body.description
             }
         });
-        return res.status(200).json(product);
+        res.status(200);
+        res.locals.product = product;
+        next();
     }
     catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
+        next(new ResponseError_1.ResponseError(500, "Internal server error", error));
     }
 });
 exports.updateProductById = updateProductById;
-// DELETE /product/:id
-const deleteProductById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const deleteProductById = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const productId = req.params.id;
     try {
         yield prisma.product.delete({
@@ -98,11 +100,12 @@ const deleteProductById = (req, res) => __awaiter(void 0, void 0, void 0, functi
                 id: Number(productId)
             }
         });
-        return res.status(204).json({ message: "Product deleted successfully" });
+        res.status(204);
+        res.locals.message = "Product deleted successfully";
+        next();
     }
     catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
+        next(new ResponseError_1.ResponseError(500, "Internal server error", error));
     }
 });
 exports.deleteProductById = deleteProductById;

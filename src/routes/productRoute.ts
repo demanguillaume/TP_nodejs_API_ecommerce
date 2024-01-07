@@ -1,20 +1,46 @@
 import express from 'express';
 import { createProduct, getAllProducts, getProductById, updateProductById, deleteProductById } from '../controllers/productController';
+import { UserRole } from '../types/User';
+
+// MIDDLEWARES
+import { authorizeByRole } from '../middlewares/authorizeByRole';
+import { sendJsonResponse } from '../middlewares/sendJsonResponse';
+
 const router = express.Router();
 
-// POST /product
-router.post('/', createProduct);
+// CREATE /product
+router.post('/', 
+    authorizeByRole([UserRole.MANAGER, UserRole.ADMIN]), 
+    createProduct,
+    sendJsonResponse('product')
+);
 
-// GET /product
-router.get('/', getAllProducts);
+// READ ALL /product
+router.get('/', 
+    authorizeByRole([UserRole.USER, UserRole.MANAGER, UserRole.ADMIN]), 
+    getAllProducts,
+    sendJsonResponse('products')
+);
 
-// GET /product/:id
-router.get('/:id', getProductById);
+// READ BY ID /product/:id
+router.get('/:id', 
+    authorizeByRole([UserRole.USER, UserRole.MANAGER, UserRole.ADMIN]), 
+    getProductById,
+    sendJsonResponse('product')
+);
 
-// PATCH /product/:id
-router.patch('/:id', updateProductById);
+// UPDATE /product/:id
+router.patch('/:id', 
+    authorizeByRole([UserRole.MANAGER, UserRole.ADMIN]), 
+    updateProductById,
+    sendJsonResponse('product')
+);
 
 // DELETE /product/:id
-router.delete('/:id', deleteProductById);
+router.delete('/:id', 
+    authorizeByRole([UserRole.MANAGER, UserRole.ADMIN]), 
+    deleteProductById,
+    sendJsonResponse('message')
+);
 
 export default router;

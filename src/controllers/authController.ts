@@ -1,9 +1,10 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { compare } from 'bcrypt';
 import { sign } from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 import { config } from 'dotenv';
 import { hash } from 'bcrypt';
+import { ResponseError } from '../types/ResponseError';
 
 const prisma = new PrismaClient();
 
@@ -14,7 +15,7 @@ if (!jwtSecret) {
     throw new Error('JWT secret key is missing');
 }
 
-export const registerUser = async (req: Request, res: Response) => {
+export const registerUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { email, password, firstName, lastName } = req.body;
 
@@ -34,37 +35,43 @@ export const registerUser = async (req: Request, res: Response) => {
         // Generate a JWT token
         const token = sign({ userId: newUser.id }, jwtSecret, { expiresIn: '1h' });
 
-        // Send the token in the response
-        return res.status(201).json({ token });
+        // Set the status and locals for the response
+        res.statusCode = 201;
+        res.locals.token = token;
+        next();
         
     } catch (error: any) {
-        return res.status(500).json({ error: error.message || 'Internal Server Error' });
+        next(new ResponseError(500, 'Internal Server Error', error));
     }
 };
 
-export const loginUser = async (req: Request, res: Response) => {
+export const loginUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { email, password } = req.body;
 
         const user = await prisma.user.findUnique({ where: { email } });
 
         if (!user) {
-            return res.status(401).json({ message: 'User not found' });
+            const responseError = new ResponseError(401, 'User not found');
+            return next(responseError);
         }
 
         // Verify that the password matches the one stored in the database
         const passwordMatch = await compare(password, user.password);
 
         if (!passwordMatch) {
-            return res.status(401).json({ message: 'Incorrect password' });
+            next(new ResponseError(401, 'Incorrect password'))
         }
 
         // Generate a JWT token
         const token = sign({ userId: user.id }, jwtSecret, { expiresIn: '1h' });
 
-        // Send the token in the response
-        return res.status(200).json({ token });
+        // Set the status and locals for the response
+        res.statusCode = 200;
+        res.locals.token = token; 
+        //res.status(200).json({token: token});
+        next();
     } catch (error: any) {
-        return res.status(500).json({ error: error.message || 'Internal Server Error' });
+        next(new ResponseError(500, 'Internal Server Error', error));
     }
 };

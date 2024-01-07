@@ -1,4 +1,4 @@
-import { User } from '../models/User';
+import { User } from '../types/User';
 import { ValidationResult } from '../interfaces/ValidationResult';
 
 export function validateUser(user: User): ValidationResult {

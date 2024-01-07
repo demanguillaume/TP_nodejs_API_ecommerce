@@ -12,7 +12,8 @@ import orderRoute from './routes/orderRoute';
 
 // MIDDLWARES
 import { isAuthenticated } from './middlewares/isAuthenticated';
-import { errorMiddleware } from './middlewares/errorMiddleware';
+import { responseErrorMiddleware } from './middlewares/responseErrorMiddleware';
+import { sendJsonResponse } from './middlewares/sendJsonResponse';
 
 const app = express();
 
@@ -20,7 +21,7 @@ const app = express();
 app.use(bodyParser.json());
 
 // Middleware to allow requests from all domains (CORS)
-app.use(cors());
+//app.use(cors());
 
 // Initialize passport (authentication middleware)
 app.use(passport.initialize());
@@ -28,7 +29,7 @@ app.use(passport.initialize());
 // Authentication routes (not protected by the isAuthenticated middleware)
 app.use('/auth', authRoute);
 
-// Apply isAuthenticated middleware to all subsequent routes
+// Middleware to check if user is authenticated
 app.use(isAuthenticated);
 
 // User routes
@@ -40,8 +41,11 @@ app.use('/product', productRoute);
 // Order routes
 app.use('/order', orderRoute);
 
-// Error middleware
-app.use(errorMiddleware);
+// Response middleware
+app.use(sendJsonResponse);
+
+// Response Error middleware
+app.use(responseErrorMiddleware);
 
 // Application listening port
 const PORT = process.env.PORT || 3000;

@@ -11,8 +11,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteOrderById = exports.updateOrderById = exports.getOrderById = exports.getAllOrders = exports.createOrder = void 0;
 const client_1 = require("@prisma/client");
+const ResponseError_1 = require("../types/ResponseError");
+//import { sendJsonResponse } from "../middlewares/sendJsonResponse";
 const prisma = new client_1.PrismaClient();
-const createOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const createOrder = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { userId, orderProducts } = req.body;
     try {
         const result = yield prisma.order.create({
@@ -29,15 +31,16 @@ const createOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                 orderProducts: true
             }
         });
-        return res.json(result);
+        res.status(201);
+        res.locals.order = result;
+        next();
     }
     catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
+        next(new ResponseError_1.ResponseError(500, "Internal server error", error));
     }
 });
 exports.createOrder = createOrder;
-const getAllOrders = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getAllOrders = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const orders = yield prisma.order.findMany({
             include: {
@@ -49,17 +52,18 @@ const getAllOrders = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             },
         });
         if (orders.length === 0) {
-            return res.status(404).json({ message: "No orders found" });
+            next(new ResponseError_1.ResponseError(404, "No orders found"));
         }
-        return res.json(orders);
+        res.status(200);
+        res.locals.orders = orders;
+        next();
     }
     catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
+        next(new ResponseError_1.ResponseError(500, "Internal server error", error));
     }
 });
 exports.getAllOrders = getAllOrders;
-const getOrderById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getOrderById = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const orderId = req.params.id;
     try {
         const order = yield prisma.order.findUnique({
@@ -75,17 +79,18 @@ const getOrderById = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             }
         });
         if (!order) {
-            return res.status(404).json({ message: "Order not found" });
+            next(new ResponseError_1.ResponseError(404, "Order not found"));
         }
-        return res.json(order);
+        res.status(200);
+        res.locals.order = order;
+        next();
     }
     catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
+        next(new ResponseError_1.ResponseError(500, "Internal server error", error));
     }
 });
 exports.getOrderById = getOrderById;
-const updateOrderById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const updateOrderById = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const orderId = req.params.id;
     const { orderProducts } = req.body;
     try {
@@ -115,15 +120,16 @@ const updateOrderById = (req, res) => __awaiter(void 0, void 0, void 0, function
                 }
             }
         });
-        return res.json(updatedOrder);
+        res.status(200);
+        res.locals.order = updatedOrder;
+        next();
     }
     catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
+        next(new ResponseError_1.ResponseError(500, "Internal server error", error));
     }
 });
 exports.updateOrderById = updateOrderById;
-const deleteOrderById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const deleteOrderById = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const orderId = req.params.id;
     try {
         yield prisma.order.delete({
@@ -131,11 +137,12 @@ const deleteOrderById = (req, res) => __awaiter(void 0, void 0, void 0, function
                 id: Number(orderId)
             }
         });
-        return res.json({ message: "Order deleted successfully" });
+        res.status(200);
+        res.locals.message = "Order deleted successfully";
+        next();
     }
     catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
+        next(new ResponseError_1.ResponseError(500, "Internal server error", error));
     }
 });
 exports.deleteOrderById = deleteOrderById;

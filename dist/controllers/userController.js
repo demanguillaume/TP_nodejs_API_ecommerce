@@ -12,14 +12,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteUserById = exports.updateUserRole = exports.updateUserById = exports.getUserById = exports.getAllUsers = exports.createUser = void 0;
 const client_1 = require("@prisma/client");
 const bcrypt_1 = require("bcrypt");
+const ResponseError_1 = require("../types/ResponseError");
 const prisma = new client_1.PrismaClient();
-// POST /user
-const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const createUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email, password, role, firstName, lastName } = req.body;
-        // Hash the password
         const hashedPassword = yield (0, bcrypt_1.hash)(password, 10);
-        // Create the user
         const user = yield prisma.user.create({
             data: {
                 email,
@@ -29,32 +27,33 @@ const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                 lastName
             }
         });
-        // Return the created user
-        return res.status(201).json(user);
+        res.status(201);
+        res.locals.user = user;
+        next();
     }
     catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
+        next(new ResponseError_1.ResponseError(500, "Internal server error", error));
     }
 });
 exports.createUser = createUser;
-// GET /user
-const getAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getAllUsers = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const users = yield prisma.user.findMany();
         if (users.length === 0) {
-            return res.status(404).json({ message: "No users found" });
+            next(new ResponseError_1.ResponseError(404, "No users found"));
         }
-        return res.status(200).json(users);
+        else {
+            res.status(200);
+            res.locals.users = users;
+            next();
+        }
     }
     catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
+        next(new ResponseError_1.ResponseError(500, "Internal server error", error));
     }
 });
 exports.getAllUsers = getAllUsers;
-// GET /user/:id
-const getUserById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getUserById = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = req.params.id;
     try {
         const user = yield prisma.user.findUnique({
@@ -63,22 +62,23 @@ const getUserById = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             }
         });
         if (!user) {
-            return res.status(404).json({ message: "User not found" });
+            next(new ResponseError_1.ResponseError(404, "User not found"));
         }
-        return res.status(200).json(user);
+        else {
+            res.status(200);
+            res.locals.user = user;
+            next();
+        }
     }
     catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
+        next(new ResponseError_1.ResponseError(500, "Internal server error", error));
     }
 });
 exports.getUserById = getUserById;
-// PATCH /user/:id
-const updateUserById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const updateUserById = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = req.params.id;
     const { email, password, firstName, lastName, role } = req.body;
     try {
-        // Hash the new password
         const hashedPassword = yield (0, bcrypt_1.hash)(password, 10);
         const user = yield prisma.user.update({
             where: {
@@ -92,16 +92,16 @@ const updateUserById = (req, res) => __awaiter(void 0, void 0, void 0, function*
                 lastName
             }
         });
-        return res.status(200).json(user);
+        res.status(200);
+        res.locals.user = user;
+        next();
     }
     catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
+        next(new ResponseError_1.ResponseError(500, "Internal server error", error));
     }
 });
 exports.updateUserById = updateUserById;
-// PATCH /user/:id/role
-const updateUserRole = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const updateUserRole = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = req.params.id;
     const { role } = req.body;
     try {
@@ -113,16 +113,16 @@ const updateUserRole = (req, res) => __awaiter(void 0, void 0, void 0, function*
                 role
             }
         });
-        return res.status(200).json(user);
+        res.status(200);
+        res.locals.user = user;
+        next();
     }
     catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
+        next(new ResponseError_1.ResponseError(500, "Internal server error", error));
     }
 });
 exports.updateUserRole = updateUserRole;
-// DELETE /user/:id
-const deleteUserById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const deleteUserById = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = req.params.id;
     try {
         yield prisma.user.delete({
@@ -130,11 +130,12 @@ const deleteUserById = (req, res) => __awaiter(void 0, void 0, void 0, function*
                 id: Number(userId)
             }
         });
-        return res.status(204).json({ message: "User deleted successfully" });
+        res.status(204);
+        res.locals.message = "User deleted successfully";
+        next();
     }
     catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
+        next(new ResponseError_1.ResponseError(500, "Internal server error", error));
     }
 });
 exports.deleteUserById = deleteUserById;

@@ -1,18 +1,16 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { hash } from 'bcrypt';
+import { ResponseError } from '../types/ResponseError';
 
 const prisma = new PrismaClient();
 
-// POST /user
-export const createUser = async (req: Request, res: Response) => {
+export const createUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { email, password, role, firstName, lastName } = req.body;
 
-        // Hash the password
         const hashedPassword = await hash(password, 10);
 
-        // Create the user
         const user = await prisma.user.create({
             data: {
                 email,
@@ -23,32 +21,31 @@ export const createUser = async (req: Request, res: Response) => {
             }
         });
 
-        // Return the created user
-        return res.status(201).json(user);
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
+        res.status(201);
+        res.locals.user = user;
+        next();
+    } catch (error: any) {
+        next(new ResponseError(500, "Internal server error", error));
     }
 };
 
-// GET /user
-export const getAllUsers = async (req: Request, res: Response) => {
+export const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const users = await prisma.user.findMany();
 
         if (users.length === 0) {
-            return res.status(404).json({ message: "No users found" });
+            next(new ResponseError(404, "No users found"));
+        } else {
+            res.status(200);
+            res.locals.users = users;
+            next();
         }
-
-        return res.status(200).json(users);
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
+    } catch (error: any) {
+        next(new ResponseError(500, "Internal server error", error));
     }
 };
 
-// GET /user/:id
-export const getUserById = async (req: Request, res: Response) => {
+export const getUserById = async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.params.id;
 
     try {
@@ -59,23 +56,22 @@ export const getUserById = async (req: Request, res: Response) => {
         });
 
         if (!user) {
-            return res.status(404).json({ message: "User not found" });
+            next(new ResponseError(404, "User not found"));
+        } else {
+            res.status(200);
+            res.locals.user = user;
+            next();
         }
-
-        return res.status(200).json(user);
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
+    } catch (error: any) {
+        next(new ResponseError(500, "Internal server error", error));
     }
 };
 
-// PATCH /user/:id
-export const updateUserById = async (req: Request, res: Response) => {
+export const updateUserById = async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.params.id;
     const { email, password, firstName, lastName, role } = req.body;
 
     try {
-        // Hash the new password
         const hashedPassword = await hash(password, 10);
 
         const user = await prisma.user.update({
@@ -91,14 +87,15 @@ export const updateUserById = async (req: Request, res: Response) => {
             }
         });
 
-        return res.status(200).json(user);
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
+        res.status(200);
+        res.locals.user = user;
+        next();
+    } catch (error: any) {
+        next(new ResponseError(500, "Internal server error", error));
     }
 };
-// PATCH /user/:id/role
-export const updateUserRole = async (req: Request, res: Response) => {
+
+export const updateUserRole = async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.params.id;
     const { role } = req.body;
 
@@ -112,15 +109,15 @@ export const updateUserRole = async (req: Request, res: Response) => {
             }
         });
 
-        return res.status(200).json(user);
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
+        res.status(200);
+        res.locals.user = user;
+        next();
+    } catch (error: any) {
+        next(new ResponseError(500, "Internal server error", error));
     }
 };
 
-// DELETE /user/:id
-export const deleteUserById = async (req: Request, res: Response) => {
+export const deleteUserById = async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.params.id;
 
     try {
@@ -130,10 +127,10 @@ export const deleteUserById = async (req: Request, res: Response) => {
             }
         });
 
-        return res.status(204).json({ message: "User deleted successfully" });
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
+        res.status(204);
+        res.locals.message = "User deleted successfully";
+        next();
+    } catch (error: any) {
+        next(new ResponseError(500, "Internal server error", error));
     }
 };
-

@@ -1,10 +1,15 @@
 import { PrismaClient } from "@prisma/client";
-import { Request, Response } from "express";
-import { OrderProduct } from "../models/Orderproduct";
+import { NextFunction, Request, Response } from "express";
+import { OrderProduct } from "../types/OrderProduct";
+import { ResponseError } from "../types/ResponseError";
+
+// MIDDLEWARES
+import { verifyOrderOwnership } from "../middlewares/verifyOrderOwnership";
+//import { sendJsonResponse } from "../middlewares/sendJsonResponse";
 
 const prisma = new PrismaClient();
 
-export const createOrder = async (req: Request, res: Response) => {
+export const createOrder = async (req: Request, res: Response, next: NextFunction) => {
     const { userId, orderProducts } = req.body;
     
     try {
@@ -22,14 +27,15 @@ export const createOrder = async (req: Request, res: Response) => {
                 orderProducts: true
             }   
         });
-        return res.json(result);
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
+        res.status(201);
+        res.locals.order = result;
+        next();
+    } catch (error: any) {
+        next(new ResponseError(500,  "Internal server error", error));
     }
 };
 
-export const getAllOrders = async (req: Request, res: Response) => {
+export const getAllOrders = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const orders = await prisma.order.findMany({
             include: {
@@ -40,19 +46,19 @@ export const getAllOrders = async (req: Request, res: Response) => {
                 }
             },
         });
-
+        
         if (orders.length === 0) {
-            return res.status(404).json({ message: "No orders found" });
+            next(new ResponseError(404, "No orders found"));
         }
-        return res.json(orders);
-
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
+        res.status(200);
+        res.locals.orders = orders;
+        next();
+    } catch (error: any) {
+        next(new ResponseError(500,  "Internal server error", error ));
     }
 };
 
-export const getOrderById = async (req: Request, res: Response) => {
+export const getOrderById = async (req: Request, res: Response, next: NextFunction) => {
     const orderId = req.params.id;
 
     try {
@@ -70,17 +76,19 @@ export const getOrderById = async (req: Request, res: Response) => {
         });
 
         if (!order) {
-            return res.status(404).json({ message: "Order not found" });
+            next(new ResponseError(404, "Order not found"));
         }
-
-        return res.json(order);
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
+        
+        res.status(200);
+        res.locals.order = order;
+        next();
+        
+    } catch (error: any) {
+        next(new ResponseError(500,  "Internal server error", error));
     }
 };
 
-export const updateOrderById = async (req: Request, res: Response) => {
+export const updateOrderById = async (req: Request, res: Response, next: NextFunction) => {
     const orderId = req.params.id;
     const { orderProducts } = req.body;
 
@@ -112,15 +120,15 @@ export const updateOrderById = async (req: Request, res: Response) => {
                 }
             }
         });
-
-        return res.json(updatedOrder);
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
+        res.status(200);
+        res.locals.order = updatedOrder;
+        next();
+    } catch (error: any) {
+        next(new ResponseError(500,  "Internal server error", error));
     }
 };
 
-export const deleteOrderById = async (req: Request, res: Response) => {
+export const deleteOrderById = async (req: Request, res: Response, next: NextFunction) => {
     const orderId = req.params.id;
 
     try {
@@ -129,10 +137,10 @@ export const deleteOrderById = async (req: Request, res: Response) => {
                 id: Number(orderId)
             }
         });
-
-        return res.json({ message: "Order deleted successfully" });
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
+        res.status(200);
+        res.locals.message = "Order deleted successfully";
+        next();
+    } catch (error: any) {
+        next(new ResponseError(500,  "Internal server error", error));
     }
 };

@@ -1,13 +1,12 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { PrismaClient } from '@prisma/client';
+import { ResponseError } from '../types/ResponseError';
 
 const prisma = new PrismaClient();
 
-// POST /product
-export const createProduct = async (req: Request, res: Response) => {
+export const createProduct = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        // Create the product
-        const product = await prisma.product.create ({
+        const product = await prisma.product.create({
             data: {
                 name: req.body.name,
                 price: req.body.price,
@@ -15,32 +14,31 @@ export const createProduct = async (req: Request, res: Response) => {
             }
         });
 
-        // Return the created product
-        return res.status(201).json(product);
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
+        res.status(201);
+        res.locals.product = product;
+        next();
+    } catch (error: any) {
+        next(new ResponseError(500, "Internal server error", error));
     }
 };
 
-// GET /product
-export const getAllProducts = async (req: Request, res: Response) => {
+export const getAllProducts = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const products = await prisma.product.findMany();
 
         if (products.length === 0) {
-            return res.status(404).json({ message: "No products found" });
+            next(new ResponseError(404, "No products found"));
+        } else {
+            res.status(200);
+            res.locals.products = products;
+            next();
         }
-
-        return res.status(200).json(products);
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
+    } catch (error: any) {
+        next(new ResponseError(500, "Internal server error", error));
     }
 };
 
-// GET /product/:id
-export const getProductById = async (req: Request, res: Response) => {
+export const getProductById = async (req: Request, res: Response, next: NextFunction) => {
     const productId = req.params.id;
 
     try {
@@ -51,18 +49,18 @@ export const getProductById = async (req: Request, res: Response) => {
         });
 
         if (!product) {
-            return res.status(404).json({ message: "Product not found" });
+            next(new ResponseError(404, "Product not found"));
+        } else {
+            res.status(200);
+            res.locals.product = product;
+            next();
         }
-
-        return res.status(200).json(product);
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
+    } catch (error: any) {
+        next(new ResponseError(500, "Internal server error", error));
     }
 };
 
-// PATCH /product/:id
-export const updateProductById = async (req: Request, res: Response) => {
+export const updateProductById = async (req: Request, res: Response, next: NextFunction) => {
     const productId = req.params.id;
     
     try {
@@ -77,16 +75,15 @@ export const updateProductById = async (req: Request, res: Response) => {
             }
         });
 
-        return res.status(200).json(product);
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
-    
+        res.status(200);
+        res.locals.product = product;
+        next();
+    } catch (error: any) {
+        next(new ResponseError(500, "Internal server error", error));
     }
 };
 
-// DELETE /product/:id
-export const deleteProductById = async (req: Request, res: Response) => {
+export const deleteProductById = async (req: Request, res: Response, next: NextFunction) => {
     const productId = req.params.id;
 
     try {
@@ -96,9 +93,10 @@ export const deleteProductById = async (req: Request, res: Response) => {
             }
         });
 
-        return res.status(204).json({ message: "Product deleted successfully" });
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
-    } 
+        res.status(204);
+        res.locals.message = "Product deleted successfully" ;
+        next();
+    } catch (error: any) {
+        next(new ResponseError(500, "Internal server error", error));
+    }
 };

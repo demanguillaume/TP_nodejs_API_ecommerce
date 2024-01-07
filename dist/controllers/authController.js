@@ -15,13 +15,14 @@ const jsonwebtoken_1 = require("jsonwebtoken");
 const client_1 = require("@prisma/client");
 const dotenv_1 = require("dotenv");
 const bcrypt_2 = require("bcrypt");
+const ResponseError_1 = require("../types/ResponseError");
 const prisma = new client_1.PrismaClient();
 (0, dotenv_1.config)(); // Load environment variables from .env file
 const jwtSecret = process.env.JWT_SECRET;
 if (!jwtSecret) {
     throw new Error('JWT secret key is missing');
 }
-const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const registerUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email, password, firstName, lastName } = req.body;
         // Hash the password
@@ -37,33 +38,39 @@ const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         });
         // Generate a JWT token
         const token = (0, jsonwebtoken_1.sign)({ userId: newUser.id }, jwtSecret, { expiresIn: '1h' });
-        // Send the token in the response
-        return res.status(201).json({ token });
+        // Set the status and locals for the response
+        res.statusCode = 201;
+        res.locals.token = token;
+        next();
     }
     catch (error) {
-        return res.status(500).json({ error: error.message || 'Internal Server Error' });
+        next(new ResponseError_1.ResponseError(500, 'Internal Server Error', error));
     }
 });
 exports.registerUser = registerUser;
-const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const loginUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email, password } = req.body;
         const user = yield prisma.user.findUnique({ where: { email } });
         if (!user) {
-            return res.status(401).json({ message: 'User not found' });
+            const responseError = new ResponseError_1.ResponseError(401, 'User not found');
+            return next(responseError);
         }
         // Verify that the password matches the one stored in the database
         const passwordMatch = yield (0, bcrypt_1.compare)(password, user.password);
         if (!passwordMatch) {
-            return res.status(401).json({ message: 'Incorrect password' });
+            next(new ResponseError_1.ResponseError(401, 'Incorrect password'));
         }
         // Generate a JWT token
         const token = (0, jsonwebtoken_1.sign)({ userId: user.id }, jwtSecret, { expiresIn: '1h' });
-        // Send the token in the response
-        return res.status(200).json({ token });
+        // Set the status and locals for the response
+        res.statusCode = 200;
+        res.locals.token = token;
+        //res.status(200).json({token: token});
+        next();
     }
     catch (error) {
-        return res.status(500).json({ error: error.message || 'Internal Server Error' });
+        next(new ResponseError_1.ResponseError(500, 'Internal Server Error', error));
     }
 });
 exports.loginUser = loginUser;
