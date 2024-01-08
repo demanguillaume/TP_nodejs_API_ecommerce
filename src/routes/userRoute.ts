@@ -4,46 +4,47 @@ import { createUser, getAllUsers, getUserById, updateUserById, deleteUserById, u
 
 // MIDDLEWARES
 import { authorizeByRole } from '../middlewares/authorizeByRole';
-import { validateUserRegistration } from '../middlewares/validateUserRegistration';
+import { validateUserDatas } from '../middlewares/validateUserDatas';
 import { UserRole } from '../types/User';
+import { sendJsonResponse } from '../middlewares/sendJsonResponse';
 
 const router = express.Router();
 
-// POST /user
+// CREATE /user
 router.post('/', 
-    validateUserRegistration(true),
+    validateUserDatas(true),
     authorizeByRole([UserRole.ADMIN]), 
-    createUser
+    createUser,
+    sendJsonResponse('user')
 );
 
-// GET /user
+// READ ALL /user
 router.get('/', 
     authorizeByRole([UserRole.ADMIN]), 
-    getAllUsers
+    getAllUsers,
+    sendJsonResponse('users')
 );
 
-// GET /user/:id
+// READ BY ID /user/:id
 router.get('/:id', 
     authorizeByRole([UserRole.ADMIN]), 
-    getUserById
+    getUserById,
+    sendJsonResponse('user')
 );
 
-// PATCH /user/:id
+// UPDATE /user/:id
 router.patch('/:id', 
+    validateUserDatas(true),
     authorizeByRole([UserRole.ADMIN]), 
-    updateUserById
-);
-
-// PATCH /user/:id/role
-router.patch('/:id/role', 
-    authorizeByRole([UserRole.ADMIN]), 
-    updateUserRole
+    updateUserById,
+    sendJsonResponse('user')
 );
 
 // DELETE /user/:id
 router.delete('/:id', 
     authorizeByRole([UserRole.ADMIN]), 
-    deleteUserById
+    deleteUserById,
+    sendJsonResponse('message')
 );
 
 export default router;

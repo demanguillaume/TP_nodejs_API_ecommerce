@@ -2,14 +2,14 @@ import express from 'express';
 import { loginUser, registerUser } from '../controllers/authController';
 
 // MIDDLEWARES
-import { validateUserRegistration } from '../middlewares/validateUserRegistration';
+import { validateUserDatas } from '../middlewares/validateUserDatas';
 import { sendJsonResponse } from '../middlewares/sendJsonResponse';
 
 const router = express.Router();
 
 // signup
 router.post('/signup', 
-    validateUserRegistration(),
+    validateUserDatas(),
     registerUser,
     sendJsonResponse('token')
 );

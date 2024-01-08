@@ -11,8 +11,7 @@ export const verifyOrderOwnership = (req: Request, res: Response, next: NextFunc
 
     // If the user role is USER, check if the order belongs to the user
     if (user.role === UserRole.USER && order.userId !== user.id) {
-        res.status(403).json({ message: 'You are not allowed to access this resource'  });
-        //next(new ResponseError(403, 'You are not allowed to access this resource'));
+        next(new ResponseError(403, 'You are not allowed to access this resource'));
     } else {
         next();
     }

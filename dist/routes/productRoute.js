@@ -10,7 +10,7 @@ const User_1 = require("../types/User");
 const authorizeByRole_1 = require("../middlewares/authorizeByRole");
 const sendJsonResponse_1 = require("../middlewares/sendJsonResponse");
 const router = express_1.default.Router();
-// READ /product
+// CREATE /product
 router.post('/', (0, authorizeByRole_1.authorizeByRole)([User_1.UserRole.MANAGER, User_1.UserRole.ADMIN]), productController_1.createProduct, (0, sendJsonResponse_1.sendJsonResponse)('product'));
 // READ ALL /product
 router.get('/', (0, authorizeByRole_1.authorizeByRole)([User_1.UserRole.USER, User_1.UserRole.MANAGER, User_1.UserRole.ADMIN]), productController_1.getAllProducts, (0, sendJsonResponse_1.sendJsonResponse)('products'));

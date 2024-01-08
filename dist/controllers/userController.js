@@ -130,7 +130,7 @@ const deleteUserById = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
                 id: Number(userId)
             }
         });
-        res.status(204);
+        res.status(200);
         res.locals.message = "User deleted successfully";
         next();
     }

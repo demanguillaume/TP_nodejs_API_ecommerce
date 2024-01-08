@@ -127,7 +127,7 @@ export const deleteUserById = async (req: Request, res: Response, next: NextFunc
             }
         });
 
-        res.status(204);
+        res.status(200);
         res.locals.message = "User deleted successfully";
         next();
     } catch (error: any) {

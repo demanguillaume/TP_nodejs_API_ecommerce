@@ -6,14 +6,16 @@ import { UserRole } from '../types/User';
 import { authorizeByRole  } from '../middlewares/authorizeByRole';
 import { verifyOrderOwnership } from '../middlewares/verifyOrderOwnership';
 import { sendJsonResponse } from '../middlewares/sendJsonResponse';
-import { check } from 'express-validator';
+
 import { checkDuplicateProductIds } from '../middlewares/checkDuplicateProductIds';
+import { validateOrderDatas } from '../middlewares/validateOrderDatas';
 
 const router = express.Router();
 
 // CREATE /order
 router.post('/', 
     authorizeByRole([UserRole.USER, UserRole.MANAGER, UserRole.ADMIN]), 
+    validateOrderDatas,
     checkDuplicateProductIds,
     createOrder,
     sendJsonResponse('order')
@@ -37,6 +39,7 @@ router.get('/:id',
 // UPDATE BY ID /order/:id
 router.patch('/:id', 
     authorizeByRole([UserRole.USER, UserRole.MANAGER, UserRole.ADMIN]), 
+    validateOrderDatas,
     checkDuplicateProductIds,
     getOrderById,
     verifyOrderOwnership,

@@ -21,7 +21,7 @@ const app = express();
 app.use(bodyParser.json());
 
 // Middleware to allow requests from all domains (CORS)
-//app.use(cors());
+app.use(cors());
 
 // Initialize passport (authentication middleware)
 app.use(passport.initialize());

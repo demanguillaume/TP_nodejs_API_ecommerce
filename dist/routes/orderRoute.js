@@ -11,9 +11,10 @@ const authorizeByRole_1 = require("../middlewares/authorizeByRole");
 const verifyOrderOwnership_1 = require("../middlewares/verifyOrderOwnership");
 const sendJsonResponse_1 = require("../middlewares/sendJsonResponse");
 const checkDuplicateProductIds_1 = require("../middlewares/checkDuplicateProductIds");
+const validateOrderDatas_1 = require("../middlewares/validateOrderDatas");
 const router = express_1.default.Router();
 // CREATE /order
-router.post('/', (0, authorizeByRole_1.authorizeByRole)([User_1.UserRole.USER, User_1.UserRole.MANAGER, User_1.UserRole.ADMIN]), checkDuplicateProductIds_1.checkDuplicateProductIds, orderController_1.createOrder, (0, sendJsonResponse_1.sendJsonResponse)('order'));
+router.post('/', validateOrderDatas_1.validateOrderDatas, (0, authorizeByRole_1.authorizeByRole)([User_1.UserRole.USER, User_1.UserRole.MANAGER, User_1.UserRole.ADMIN]), checkDuplicateProductIds_1.checkDuplicateProductIds, orderController_1.createOrder, (0, sendJsonResponse_1.sendJsonResponse)('order'));
 // READ ALL /order
 router.get('/', (0, authorizeByRole_1.authorizeByRole)([User_1.UserRole.MANAGER, User_1.UserRole.ADMIN]), orderController_1.getAllOrders, (0, sendJsonResponse_1.sendJsonResponse)('orders'));
 // READ BY ID /order/:id
