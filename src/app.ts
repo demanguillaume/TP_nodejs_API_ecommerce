@@ -16,6 +16,7 @@ import { responseErrorMiddleware } from './middlewares/responseErrorMiddleware';
 import { sendJsonResponse } from './middlewares/sendJsonResponse';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import { createAdminUser } from './utils/createAdminUser';
 
 const app = express();
 
@@ -62,6 +63,9 @@ app.use(responseErrorMiddleware);
 
 // Application listening port
 const PORT = process.env.PORT || 3000;
+
+// Create the admin user if needed
+createAdminUser();
 
 // Start the server
 app.listen(PORT, () => {

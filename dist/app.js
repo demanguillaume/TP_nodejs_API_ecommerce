@@ -19,6 +19,7 @@ const responseErrorMiddleware_1 = require("./middlewares/responseErrorMiddleware
 const sendJsonResponse_1 = require("./middlewares/sendJsonResponse");
 const helmet_1 = __importDefault(require("helmet"));
 const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
+const createAdminUser_1 = require("./utils/createAdminUser");
 const app = (0, express_1.default)();
 // Security middleware
 app.use((0, helmet_1.default)());
@@ -51,6 +52,8 @@ app.use(sendJsonResponse_1.sendJsonResponse);
 app.use(responseErrorMiddleware_1.responseErrorMiddleware);
 // Application listening port
 const PORT = process.env.PORT || 3000;
+// Create the admin user if needed
+(0, createAdminUser_1.createAdminUser)();
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
