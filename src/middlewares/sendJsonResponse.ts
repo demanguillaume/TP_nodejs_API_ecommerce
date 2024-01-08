@@ -7,6 +7,6 @@ export const sendJsonResponse = (key: string) => {
     if (key === 'token') {
       responseData = { token: responseData };
     }
-    return res.status(responseStatus).json(responseData); 
+    return res.status(responseStatus).json(responseData);
   };
 };

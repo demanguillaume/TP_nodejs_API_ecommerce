@@ -16,23 +16,27 @@ const ResponseError_1 = require("../types/ResponseError");
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 exports.validateOrderDatas = [
-    (0, express_validator_1.check)('userId')
-        .optional()
-        .isInt().withMessage('userId must be an integer'),
+    (0, express_validator_1.check)('userId').optional().isInt().withMessage('userId must be an integer'),
     (0, express_validator_1.check)('orderProducts')
-        .isArray().withMessage('orderProducts must be an array')
-        .notEmpty().withMessage('orderProducts is required'),
+        .isArray()
+        .withMessage('orderProducts must be an array')
+        .notEmpty()
+        .withMessage('orderProducts is required'),
     (0, express_validator_1.check)('orderProducts.*.productId')
-        .isInt().withMessage('productId must be an integer')
-        .notEmpty().withMessage('productId is required'),
+        .isInt()
+        .withMessage('productId must be an integer')
+        .notEmpty()
+        .withMessage('productId is required'),
     (0, express_validator_1.check)('orderProducts.*.quantity')
-        .isInt().withMessage('quantity must be an integer')
-        .notEmpty().withMessage('quantity is required'),
+        .isInt()
+        .withMessage('quantity must be an integer')
+        .notEmpty()
+        .withMessage('quantity is required'),
     (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         const errors = (0, express_validator_1.validationResult)(req);
         if (!errors.isEmpty()) {
-            const errorMessages = errors.array().map(error => error.msg);
-            next(new ResponseError_1.ResponseError(400, errorMessages.toString().replace(",", " | "), 'Validation Error: ' + JSON.stringify(errorMessages)));
+            const errorMessages = errors.array().map((error) => error.msg);
+            next(new ResponseError_1.ResponseError(400, errorMessages.toString().replace(',', ' | '), 'Validation Error: ' + JSON.stringify(errorMessages)));
         }
         else {
             if (req.body.userId === undefined) {
@@ -44,7 +48,9 @@ exports.validateOrderDatas = [
                 }
             }
             // Check if the user exists
-            const user = yield prisma.user.findUnique({ where: { id: req.body.userId } });
+            const user = yield prisma.user.findUnique({
+                where: { id: req.body.userId },
+            });
             if (!user) {
                 next(new ResponseError_1.ResponseError(404, 'User not found', 'The provided userId does not exist in the database'));
             }

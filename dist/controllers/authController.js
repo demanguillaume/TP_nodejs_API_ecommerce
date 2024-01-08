@@ -66,7 +66,6 @@ const loginUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function
         // Set the status and locals for the response
         res.statusCode = 200;
         res.locals.token = token;
-        //res.status(200).json({token: token});
         next();
     }
     catch (error) {

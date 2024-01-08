@@ -20,11 +20,13 @@ dotenv_1.default.config();
 const prisma = new client_1.PrismaClient();
 const opts = {
     jwtFromRequest: passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
-    secretOrKey: process.env.JWT_SECRET
+    secretOrKey: process.env.JWT_SECRET,
 };
 passport_1.default.use(new passport_jwt_1.Strategy(opts, (jwt_payload, done) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const user = yield prisma.user.findUnique({ where: { id: jwt_payload.userId } });
+        const user = yield prisma.user.findUnique({
+            where: { id: jwt_payload.userId },
+        });
         if (user) {
             return done(null, user);
         }

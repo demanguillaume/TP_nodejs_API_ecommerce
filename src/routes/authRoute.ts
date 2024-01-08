@@ -8,16 +8,14 @@ import { sendJsonResponse } from '../middlewares/sendJsonResponse';
 const router = express.Router();
 
 // signup
-router.post('/signup', 
-    validateUserDatas(),
-    registerUser,
-    sendJsonResponse('token')
+router.post(
+  '/signup',
+  validateUserDatas(),
+  registerUser,
+  sendJsonResponse('token'),
 );
 
 // signin
-router.post('/signin', 
-    loginUser,
-    sendJsonResponse('token')
-);
+router.post('/signin', loginUser, sendJsonResponse('token'));
 
 export default router;

@@ -1,7 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import './utils/passport'; 
+import './utils/passport';
 import passport from 'passport';
 
 // ROUTES
@@ -27,7 +27,7 @@ app.use(cors());
 const limiter = rateLimit({
   max: 10,
   windowMs: 60 * 60 * 1000, // 1 hour
-  message: 'Too many requests from this IP, please try again in an hour!'
+  message: 'Too many requests from this IP, please try again in an hour!',
 });
 app.use(limiter);
 

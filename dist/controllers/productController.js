@@ -19,15 +19,15 @@ const createProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, func
             data: {
                 name: req.body.name,
                 price: req.body.price,
-                description: req.body.description
-            }
+                description: req.body.description,
+            },
         });
         res.status(201);
         res.locals.product = product;
         next();
     }
     catch (error) {
-        next(new ResponseError_1.ResponseError(500, "Internal server error", error));
+        next(new ResponseError_1.ResponseError(500, 'Internal server error', error));
     }
 });
 exports.createProduct = createProduct;
@@ -35,7 +35,7 @@ const getAllProducts = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
     try {
         const products = yield prisma.product.findMany();
         if (products.length === 0) {
-            next(new ResponseError_1.ResponseError(404, "No products found"));
+            next(new ResponseError_1.ResponseError(404, 'No products found'));
         }
         else {
             res.status(200);
@@ -44,7 +44,7 @@ const getAllProducts = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
         }
     }
     catch (error) {
-        next(new ResponseError_1.ResponseError(500, "Internal server error", error));
+        next(new ResponseError_1.ResponseError(500, 'Internal server error', error));
     }
 });
 exports.getAllProducts = getAllProducts;
@@ -53,11 +53,11 @@ const getProductById = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
     try {
         const product = yield prisma.product.findUnique({
             where: {
-                id: Number(productId)
-            }
+                id: Number(productId),
+            },
         });
         if (!product) {
-            next(new ResponseError_1.ResponseError(404, "Product not found"));
+            next(new ResponseError_1.ResponseError(404, 'Product not found'));
         }
         else {
             res.status(200);
@@ -66,7 +66,7 @@ const getProductById = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
         }
     }
     catch (error) {
-        next(new ResponseError_1.ResponseError(500, "Internal server error", error));
+        next(new ResponseError_1.ResponseError(500, 'Internal server error', error));
     }
 });
 exports.getProductById = getProductById;
@@ -75,20 +75,20 @@ const updateProductById = (req, res, next) => __awaiter(void 0, void 0, void 0, 
     try {
         const product = yield prisma.product.update({
             where: {
-                id: Number(productId)
+                id: Number(productId),
             },
             data: {
                 name: req.body.name,
                 price: req.body.price,
-                description: req.body.description
-            }
+                description: req.body.description,
+            },
         });
         res.status(200);
         res.locals.product = product;
         next();
     }
     catch (error) {
-        next(new ResponseError_1.ResponseError(500, "Internal server error", error));
+        next(new ResponseError_1.ResponseError(500, 'Internal server error', error));
     }
 });
 exports.updateProductById = updateProductById;
@@ -97,15 +97,15 @@ const deleteProductById = (req, res, next) => __awaiter(void 0, void 0, void 0, 
     try {
         yield prisma.product.delete({
             where: {
-                id: Number(productId)
-            }
+                id: Number(productId),
+            },
         });
         res.status(204);
-        res.locals.message = "Product deleted successfully";
+        res.locals.message = 'Product deleted successfully';
         next();
     }
     catch (error) {
-        next(new ResponseError_1.ResponseError(500, "Internal server error", error));
+        next(new ResponseError_1.ResponseError(500, 'Internal server error', error));
     }
 });
 exports.deleteProductById = deleteProductById;

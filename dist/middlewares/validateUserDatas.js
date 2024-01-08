@@ -20,16 +20,23 @@ const validateUserDatas = (requireUserRole = false) => [
         .withMessage('Password must contain a special character'),
     (0, express_validator_1.check)('firstName').isLength({ min: 2 }),
     (0, express_validator_1.check)('lastName').isLength({ min: 2 }),
-    ...(requireUserRole ? [(0, express_validator_1.check)('userRole').isIn(Object.values(User_1.UserRole)).withMessage('Role is not valid')] : []),
+    ...(requireUserRole
+        ? [
+            (0, express_validator_1.check)('userRole')
+                .isIn(Object.values(User_1.UserRole))
+                .withMessage('Role is not valid'),
+        ]
+        : []),
     (req, res, next) => {
         const errors = (0, express_validator_1.validationResult)(req);
         if (!errors.isEmpty()) {
-            const errorMessages = errors.array().map(error => error.msg);
-            next(new ResponseError_1.ResponseError(400, errorMessages.toString().replace(",", " | "), 'Validation Error: ' + JSON.stringify(errorMessages)));
+            const errorMessages = errors.array().map((error) => error.msg);
+            next(new ResponseError_1.ResponseError(400, errorMessages.toString().replace(',', ' | '), 'Validation Error: ' + JSON.stringify(errorMessages)));
         }
         const prisma = new client_1.PrismaClient();
         const { email } = req.body;
-        prisma.user.findUnique({ where: { email } })
+        prisma.user
+            .findUnique({ where: { email } })
             .then((user) => {
             if (user) {
                 next(new ResponseError_1.ResponseError(400, 'Email already exists', 'Email already exists'));

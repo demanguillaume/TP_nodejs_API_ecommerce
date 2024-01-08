@@ -27,7 +27,7 @@ app.use((0, cors_1.default)());
 const limiter = (0, express_rate_limit_1.default)({
     max: 10,
     windowMs: 60 * 60 * 1000, // 1 hour
-    message: 'Too many requests from this IP, please try again in an hour!'
+    message: 'Too many requests from this IP, please try again in an hour!',
 });
 app.use(limiter);
 // Middleware to parse request bodies as JSON

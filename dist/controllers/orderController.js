@@ -23,20 +23,20 @@ const createOrder = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
                 orderProducts: {
                     create: orderProducts.map((orderProduct) => ({
                         productId: orderProduct.productId,
-                        quantity: orderProduct.quantity
-                    }))
-                }
+                        quantity: orderProduct.quantity,
+                    })),
+                },
             },
             include: {
-                orderProducts: true
-            }
+                orderProducts: true,
+            },
         });
         res.status(201);
         res.locals.order = result;
         next();
     }
     catch (error) {
-        next(new ResponseError_1.ResponseError(500, "Internal server error", error));
+        next(new ResponseError_1.ResponseError(500, 'Internal server error', error));
     }
 });
 exports.createOrder = createOrder;
@@ -46,20 +46,20 @@ const getAllOrders = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
             include: {
                 orderProducts: {
                     include: {
-                        product: true
-                    }
-                }
+                        product: true,
+                    },
+                },
             },
         });
         if (orders.length === 0) {
-            next(new ResponseError_1.ResponseError(404, "No orders found"));
+            next(new ResponseError_1.ResponseError(404, 'No orders found'));
         }
         res.status(200);
         res.locals.orders = orders;
         next();
     }
     catch (error) {
-        next(new ResponseError_1.ResponseError(500, "Internal server error", error));
+        next(new ResponseError_1.ResponseError(500, 'Internal server error', error));
     }
 });
 exports.getAllOrders = getAllOrders;
@@ -68,25 +68,25 @@ const getOrderById = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
     try {
         const order = yield prisma.order.findUnique({
             where: {
-                id: Number(orderId)
+                id: Number(orderId),
             },
             include: {
                 orderProducts: {
                     include: {
-                        product: true
-                    }
-                }
-            }
+                        product: true,
+                    },
+                },
+            },
         });
         if (!order) {
-            next(new ResponseError_1.ResponseError(404, "Order not found"));
+            next(new ResponseError_1.ResponseError(404, 'Order not found'));
         }
         res.status(200);
         res.locals.order = order;
         next();
     }
     catch (error) {
-        next(new ResponseError_1.ResponseError(500, "Internal server error", error));
+        next(new ResponseError_1.ResponseError(500, 'Internal server error', error));
     }
 });
 exports.getOrderById = getOrderById;
@@ -96,36 +96,36 @@ const updateOrderById = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
     try {
         yield prisma.orderProduct.deleteMany({
             where: {
-                orderId: Number(orderId)
-            }
+                orderId: Number(orderId),
+            },
         });
         const updatedOrder = yield prisma.order.update({
             where: {
-                id: Number(orderId)
+                id: Number(orderId),
             },
             data: {
                 updatedAt: new Date(),
                 orderProducts: {
                     create: orderProducts.map((orderProduct) => ({
                         productId: orderProduct.productId,
-                        quantity: orderProduct.quantity
-                    }))
-                }
+                        quantity: orderProduct.quantity,
+                    })),
+                },
             },
             include: {
                 orderProducts: {
                     include: {
-                        product: true
-                    }
-                }
-            }
+                        product: true,
+                    },
+                },
+            },
         });
         res.status(200);
         res.locals.order = updatedOrder;
         next();
     }
     catch (error) {
-        next(new ResponseError_1.ResponseError(500, "Internal server error", error));
+        next(new ResponseError_1.ResponseError(500, 'Internal server error', error));
     }
 });
 exports.updateOrderById = updateOrderById;
@@ -134,15 +134,15 @@ const deleteOrderById = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
     try {
         yield prisma.order.delete({
             where: {
-                id: Number(orderId)
-            }
+                id: Number(orderId),
+            },
         });
         res.status(200);
-        res.locals.message = "Order deleted successfully";
+        res.locals.message = 'Order deleted successfully';
         next();
     }
     catch (error) {
-        next(new ResponseError_1.ResponseError(500, "Internal server error", error));
+        next(new ResponseError_1.ResponseError(500, 'Internal server error', error));
     }
 });
 exports.deleteOrderById = deleteOrderById;

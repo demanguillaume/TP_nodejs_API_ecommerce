@@ -24,15 +24,15 @@ const createUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
                 password: hashedPassword,
                 role,
                 firstName,
-                lastName
-            }
+                lastName,
+            },
         });
         res.status(201);
         res.locals.user = user;
         next();
     }
     catch (error) {
-        next(new ResponseError_1.ResponseError(500, "Internal server error", error));
+        next(new ResponseError_1.ResponseError(500, 'Internal server error', error));
     }
 });
 exports.createUser = createUser;
@@ -40,7 +40,7 @@ const getAllUsers = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
     try {
         const users = yield prisma.user.findMany();
         if (users.length === 0) {
-            next(new ResponseError_1.ResponseError(404, "No users found"));
+            next(new ResponseError_1.ResponseError(404, 'No users found'));
         }
         else {
             res.status(200);
@@ -49,7 +49,7 @@ const getAllUsers = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
         }
     }
     catch (error) {
-        next(new ResponseError_1.ResponseError(500, "Internal server error", error));
+        next(new ResponseError_1.ResponseError(500, 'Internal server error', error));
     }
 });
 exports.getAllUsers = getAllUsers;
@@ -58,11 +58,11 @@ const getUserById = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
     try {
         const user = yield prisma.user.findUnique({
             where: {
-                id: Number(userId)
-            }
+                id: Number(userId),
+            },
         });
         if (!user) {
-            next(new ResponseError_1.ResponseError(404, "User not found"));
+            next(new ResponseError_1.ResponseError(404, 'User not found'));
         }
         else {
             res.status(200);
@@ -71,7 +71,7 @@ const getUserById = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
         }
     }
     catch (error) {
-        next(new ResponseError_1.ResponseError(500, "Internal server error", error));
+        next(new ResponseError_1.ResponseError(500, 'Internal server error', error));
     }
 });
 exports.getUserById = getUserById;
@@ -82,22 +82,22 @@ const updateUserById = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
         const hashedPassword = yield (0, bcrypt_1.hash)(password, 10);
         const user = yield prisma.user.update({
             where: {
-                id: Number(userId)
+                id: Number(userId),
             },
             data: {
                 email,
                 password: hashedPassword,
                 firstName,
                 role,
-                lastName
-            }
+                lastName,
+            },
         });
         res.status(200);
         res.locals.user = user;
         next();
     }
     catch (error) {
-        next(new ResponseError_1.ResponseError(500, "Internal server error", error));
+        next(new ResponseError_1.ResponseError(500, 'Internal server error', error));
     }
 });
 exports.updateUserById = updateUserById;
@@ -107,18 +107,18 @@ const updateUserRole = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
     try {
         const user = yield prisma.user.update({
             where: {
-                id: Number(userId)
+                id: Number(userId),
             },
             data: {
-                role
-            }
+                role,
+            },
         });
         res.status(200);
         res.locals.user = user;
         next();
     }
     catch (error) {
-        next(new ResponseError_1.ResponseError(500, "Internal server error", error));
+        next(new ResponseError_1.ResponseError(500, 'Internal server error', error));
     }
 });
 exports.updateUserRole = updateUserRole;
@@ -127,15 +127,15 @@ const deleteUserById = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
     try {
         yield prisma.user.delete({
             where: {
-                id: Number(userId)
-            }
+                id: Number(userId),
+            },
         });
         res.status(200);
-        res.locals.message = "User deleted successfully";
+        res.locals.message = 'User deleted successfully';
         next();
     }
     catch (error) {
-        next(new ResponseError_1.ResponseError(500, "Internal server error", error));
+        next(new ResponseError_1.ResponseError(500, 'Internal server error', error));
     }
 });
 exports.deleteUserById = deleteUserById;
