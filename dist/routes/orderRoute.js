@@ -14,13 +14,13 @@ const checkDuplicateProductIds_1 = require("../middlewares/checkDuplicateProduct
 const validateOrderDatas_1 = require("../middlewares/validateOrderDatas");
 const router = express_1.default.Router();
 // CREATE /order
-router.post('/', validateOrderDatas_1.validateOrderDatas, (0, authorizeByRole_1.authorizeByRole)([User_1.UserRole.USER, User_1.UserRole.MANAGER, User_1.UserRole.ADMIN]), checkDuplicateProductIds_1.checkDuplicateProductIds, orderController_1.createOrder, (0, sendJsonResponse_1.sendJsonResponse)('order'));
+router.post('/', (0, authorizeByRole_1.authorizeByRole)([User_1.UserRole.USER, User_1.UserRole.MANAGER, User_1.UserRole.ADMIN]), validateOrderDatas_1.validateOrderDatas, checkDuplicateProductIds_1.checkDuplicateProductIds, orderController_1.createOrder, (0, sendJsonResponse_1.sendJsonResponse)('order'));
 // READ ALL /order
 router.get('/', (0, authorizeByRole_1.authorizeByRole)([User_1.UserRole.MANAGER, User_1.UserRole.ADMIN]), orderController_1.getAllOrders, (0, sendJsonResponse_1.sendJsonResponse)('orders'));
 // READ BY ID /order/:id
 router.get('/:id', (0, authorizeByRole_1.authorizeByRole)([User_1.UserRole.USER, User_1.UserRole.MANAGER, User_1.UserRole.ADMIN]), orderController_1.getOrderById, verifyOrderOwnership_1.verifyOrderOwnership, (0, sendJsonResponse_1.sendJsonResponse)('order'));
 // UPDATE BY ID /order/:id
-router.patch('/:id', (0, authorizeByRole_1.authorizeByRole)([User_1.UserRole.USER, User_1.UserRole.MANAGER, User_1.UserRole.ADMIN]), checkDuplicateProductIds_1.checkDuplicateProductIds, orderController_1.getOrderById, verifyOrderOwnership_1.verifyOrderOwnership, orderController_1.updateOrderById, (0, sendJsonResponse_1.sendJsonResponse)('order'));
+router.patch('/:id', (0, authorizeByRole_1.authorizeByRole)([User_1.UserRole.USER, User_1.UserRole.MANAGER, User_1.UserRole.ADMIN]), validateOrderDatas_1.validateOrderDatas, checkDuplicateProductIds_1.checkDuplicateProductIds, orderController_1.getOrderById, verifyOrderOwnership_1.verifyOrderOwnership, orderController_1.updateOrderById, (0, sendJsonResponse_1.sendJsonResponse)('order'));
 // DELETE BY ID /order/:id
 router.delete('/:id', (0, authorizeByRole_1.authorizeByRole)([User_1.UserRole.USER, User_1.UserRole.MANAGER, User_1.UserRole.ADMIN]), orderController_1.getOrderById, verifyOrderOwnership_1.verifyOrderOwnership, orderController_1.deleteOrderById, (0, sendJsonResponse_1.sendJsonResponse)('message'));
 exports.default = router;

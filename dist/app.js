@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
+const cors_1 = __importDefault(require("cors"));
 require("./utils/passport");
 const passport_1 = __importDefault(require("passport"));
 // ROUTES
@@ -16,11 +17,22 @@ const orderRoute_1 = __importDefault(require("./routes/orderRoute"));
 const isAuthenticated_1 = require("./middlewares/isAuthenticated");
 const responseErrorMiddleware_1 = require("./middlewares/responseErrorMiddleware");
 const sendJsonResponse_1 = require("./middlewares/sendJsonResponse");
+const helmet_1 = __importDefault(require("helmet"));
+const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 const app = (0, express_1.default)();
+// Security middleware
+app.use((0, helmet_1.default)());
+app.use((0, cors_1.default)());
+// Limit requests from the same IP
+const limiter = (0, express_rate_limit_1.default)({
+    max: 10,
+    windowMs: 60 * 60 * 1000, // 1 hour
+    message: 'Too many requests from this IP, please try again in an hour!'
+});
+app.use(limiter);
 // Middleware to parse request bodies as JSON
 app.use(body_parser_1.default.json());
 // Middleware to allow requests from all domains (CORS)
-//app.use(cors());
 // Initialize passport (authentication middleware)
 app.use(passport_1.default.initialize());
 // Authentication routes (not protected by the isAuthenticated middleware)
