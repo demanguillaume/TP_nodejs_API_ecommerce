@@ -113,7 +113,7 @@ export const deleteProductById = async (
       },
     });
 
-    res.status(204);
+    res.status(200);
     res.locals.message = 'Product deleted successfully';
     next();
   } catch (error: any) {

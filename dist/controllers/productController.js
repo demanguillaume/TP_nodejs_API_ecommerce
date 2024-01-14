@@ -100,7 +100,7 @@ const deleteProductById = (req, res, next) => __awaiter(void 0, void 0, void 0, 
                 id: Number(productId),
             },
         });
-        res.status(204);
+        res.status(200);
         res.locals.message = 'Product deleted successfully';
         next();
     }
