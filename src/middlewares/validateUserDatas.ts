@@ -18,8 +18,8 @@ export const validateUserDatas = (allFieldsRequired = false) => [
     .withMessage('Password must contain an uppercase letter')
     .matches(/[^a-zA-Z0-9]/)
     .withMessage('Password must contain a special character'),
-  check('firstName').optional(!allFieldsRequired).isLength({ min: 2 }),
-  check('lastName').optional(!allFieldsRequired).isLength({ min: 2 }),
+  check('firstName').optional(!allFieldsRequired).isLength({ min: 2 }).withMessage('First name is not valid'),
+  check('lastName').optional(!allFieldsRequired).isLength({ min: 2 }).withMessage,
   check('userRole')
     .optional(!allFieldsRequired)
     .isIn(Object.values(UserRole))
