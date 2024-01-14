@@ -5,10 +5,10 @@
       "type": "node",
       "request": "launch",
       "name": "Launch Program",
-      "program": "${workspaceFolder}/dist/app.js", 
+      "program": "${workspaceFolder}/dist/app.js",
       //"preLaunchTask": "tsc: build - tsconfig.json",
       "outFiles": ["${workspaceFolder}/dist/**/*.js"],
-      "sourceMaps": true 
+      "sourceMaps": true
     }
   ]
 }

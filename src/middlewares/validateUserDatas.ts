@@ -5,7 +5,10 @@ import { ResponseError } from '../types/ResponseError';
 import { PrismaClient } from '@prisma/client';
 
 export const validateUserDatas = (allFieldsRequired = false) => [
-  check('email').optional(!allFieldsRequired).isEmail().withMessage('Email is not valid'),
+  check('email')
+    .optional(!allFieldsRequired)
+    .isEmail()
+    .withMessage('Email is not valid'),
   check('password')
     .optional(!allFieldsRequired)
     .isLength({ min: 8 })
@@ -18,34 +21,41 @@ export const validateUserDatas = (allFieldsRequired = false) => [
     .withMessage('Password must contain an uppercase letter')
     .matches(/[^a-zA-Z0-9]/)
     .withMessage('Password must contain a special character'),
-  check('firstName').optional(!allFieldsRequired).isLength({ min: 2 }).withMessage('First name is not valid'),
-  check('lastName').optional(!allFieldsRequired).isLength({ min: 2 }).withMessage,
+  check('firstName')
+    .optional(!allFieldsRequired)
+    .isLength({ min: 2 })
+    .withMessage('First name is not valid'),
+  check('lastName')
+    .optional(!allFieldsRequired)
+    .isLength({ min: 2 })
+    .withMessage('Last name is not valid'),
   check('userRole')
     .optional(!allFieldsRequired)
     .isIn(Object.values(UserRole))
     .withMessage('Role is not valid'),
 
-  (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       const errorMessages = errors.array().map((error) => error.msg);
-
-      next(
+      return next(
         new ResponseError(
           400,
-          errorMessages.toString().replace(',', ' | '),
+          errorMessages.join(' | '),
           'Validation Error: ' + JSON.stringify(errorMessages),
         ),
       );
     }
 
-    const prisma = new PrismaClient();
     const { email } = req.body;
 
-    prisma.user
-      .findUnique({ where: { email } })
-      .then((user) => {
-        if (user && allFieldsRequired) {
+    if (email) {
+      const prisma = new PrismaClient();
+
+      try {
+        const user = await prisma.user.findUnique({ where: { email } });
+
+        if (user) {
           next(
             new ResponseError(
               400,
@@ -53,12 +63,16 @@ export const validateUserDatas = (allFieldsRequired = false) => [
               'Email already exists',
             ),
           );
-        } else {
-          next();
         }
-      })
-      .catch((error) => {
-        next(new ResponseError(500, 'Internal Server Error', error.message));
-      });
+
+        next();
+      } catch (error: any) {
+        next(new ResponseError(500, 'Internal Server Error', error));
+      } finally {
+        await prisma.$disconnect();
+      }
+    } else {
+      next();
+    }
   },
 ];
