@@ -126,32 +126,6 @@ export const updateUserById = async (
   }
 };
 
-export const updateUserRole = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const userId = req.params.id;
-  const { role } = req.body;
-
-  try {
-    const user = await prisma.user.update({
-      where: {
-        id: Number(userId),
-      },
-      data: {
-        role,
-      },
-    });
-
-    res.status(200);
-    res.locals.user = user;
-    next();
-  } catch (error: any) {
-    next(new ResponseError(500, 'Internal server error', error));
-  }
-};
-
 export const deleteUserById = async (
   req: Request,
   res: Response,

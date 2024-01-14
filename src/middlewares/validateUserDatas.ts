@@ -29,7 +29,7 @@ export const validateUserDatas = (allFieldsRequired = false) => [
     .optional(!allFieldsRequired)
     .isLength({ min: 2 })
     .withMessage('Last name is not valid'),
-  check('userRole')
+  check('role')
     .optional(!allFieldsRequired)
     .isIn(Object.values(UserRole))
     .withMessage('Role is not valid'),

@@ -5,9 +5,7 @@ import {
   getUserById,
   updateUserById,
   deleteUserById,
-  updateUserRole,
 } from '../controllers/userController';
-//import { UserRole } from '../types/User';
 
 // MIDDLEWARES
 import { authorizeByRole } from '../middlewares/authorizeByRole';
