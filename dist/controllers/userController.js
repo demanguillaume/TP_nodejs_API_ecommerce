@@ -78,19 +78,29 @@ exports.getUserById = getUserById;
 const updateUserById = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = req.params.id;
     const { email, password, firstName, lastName, role } = req.body;
-    try {
+    let updateData = {};
+    if (email) {
+        updateData.email = email;
+    }
+    if (password) {
         const hashedPassword = yield (0, bcrypt_1.hash)(password, 10);
+        updateData.password = hashedPassword;
+    }
+    if (firstName) {
+        updateData.firstName = firstName;
+    }
+    if (lastName) {
+        updateData.lastName = lastName;
+    }
+    if (role) {
+        updateData.role = role;
+    }
+    try {
         const user = yield prisma.user.update({
             where: {
                 id: Number(userId),
             },
-            data: {
-                email,
-                password: hashedPassword,
-                firstName,
-                role,
-                lastName,
-            },
+            data: updateData,
         });
         res.status(200);
         res.locals.user = user;

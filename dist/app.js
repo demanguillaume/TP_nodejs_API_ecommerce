@@ -26,9 +26,9 @@ app.use((0, helmet_1.default)());
 app.use((0, cors_1.default)());
 // Limit requests from the same IP
 const limiter = (0, express_rate_limit_1.default)({
-    max: 10,
-    windowMs: 60 * 60 * 1000, // 1 hour
-    message: 'Too many requests from this IP, please try again in an hour!',
+    max: 15,
+    windowMs: 2 * 60 * 1000, // 2 minutes
+    message: 'Too many requests from this IP, please try again in 2 minutes !',
 });
 app.use(limiter);
 // Middleware to parse request bodies as JSON

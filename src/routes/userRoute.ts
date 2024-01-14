@@ -45,7 +45,7 @@ router.get(
 // UPDATE /user/:id
 router.patch(
   '/:id',
-  validateUserDatas(true),
+  validateUserDatas(false),
   authorizeByRole([UserRole.ADMIN]),
   updateUserById,
   sendJsonResponse('user'),

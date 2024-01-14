@@ -5,9 +5,10 @@ const express_validator_1 = require("express-validator");
 const User_1 = require("../types/User");
 const ResponseError_1 = require("../types/ResponseError");
 const client_1 = require("@prisma/client");
-const validateUserDatas = (requireUserRole = false) => [
-    (0, express_validator_1.check)('email').isEmail().withMessage('Email is not valid'),
+const validateUserDatas = (allFieldsRequired = false) => [
+    (0, express_validator_1.check)('email').optional(!allFieldsRequired).isEmail().withMessage('Email is not valid'),
     (0, express_validator_1.check)('password')
+        .optional(!allFieldsRequired)
         .isLength({ min: 8 })
         .withMessage('Password must be at least 8 characters long')
         .matches(/\d/)
@@ -18,15 +19,12 @@ const validateUserDatas = (requireUserRole = false) => [
         .withMessage('Password must contain an uppercase letter')
         .matches(/[^a-zA-Z0-9]/)
         .withMessage('Password must contain a special character'),
-    (0, express_validator_1.check)('firstName').isLength({ min: 2 }),
-    (0, express_validator_1.check)('lastName').isLength({ min: 2 }),
-    ...(requireUserRole
-        ? [
-            (0, express_validator_1.check)('userRole')
-                .isIn(Object.values(User_1.UserRole))
-                .withMessage('Role is not valid'),
-        ]
-        : []),
+    (0, express_validator_1.check)('firstName').optional(!allFieldsRequired).isLength({ min: 2 }),
+    (0, express_validator_1.check)('lastName').optional(!allFieldsRequired).isLength({ min: 2 }),
+    (0, express_validator_1.check)('userRole')
+        .optional(!allFieldsRequired)
+        .isIn(Object.values(User_1.UserRole))
+        .withMessage('Role is not valid'),
     (req, res, next) => {
         const errors = (0, express_validator_1.validationResult)(req);
         if (!errors.isEmpty()) {
@@ -38,7 +36,7 @@ const validateUserDatas = (requireUserRole = false) => [
         prisma.user
             .findUnique({ where: { email } })
             .then((user) => {
-            if (user) {
+            if (user && allFieldsRequired) {
                 next(new ResponseError_1.ResponseError(400, 'Email already exists', 'Email already exists'));
             }
             else {

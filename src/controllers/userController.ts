@@ -87,20 +87,35 @@ export const updateUserById = async (
   const userId = req.params.id;
   const { email, password, firstName, lastName, role } = req.body;
 
-  try {
-    const hashedPassword = await hash(password, 10);
+  let updateData: any = {};
 
+  if (email) {
+    updateData.email = email;
+  }
+
+  if (password) {
+    const hashedPassword = await hash(password, 10);
+    updateData.password = hashedPassword;
+  }
+
+  if (firstName) {
+    updateData.firstName = firstName;
+  }
+
+  if (lastName) {
+    updateData.lastName = lastName;
+  }
+
+  if (role) {
+    updateData.role = role;
+  }
+
+  try {
     const user = await prisma.user.update({
       where: {
         id: Number(userId),
       },
-      data: {
-        email,
-        password: hashedPassword,
-        firstName,
-        role,
-        lastName,
-      },
+      data: updateData,
     });
 
     res.status(200);

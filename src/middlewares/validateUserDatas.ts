@@ -4,9 +4,10 @@ import { Request, Response, NextFunction } from 'express';
 import { ResponseError } from '../types/ResponseError';
 import { PrismaClient } from '@prisma/client';
 
-export const validateUserDatas = (requireUserRole = false) => [
-  check('email').isEmail().withMessage('Email is not valid'),
+export const validateUserDatas = (allFieldsRequired = false) => [
+  check('email').optional(!allFieldsRequired).isEmail().withMessage('Email is not valid'),
   check('password')
+    .optional(!allFieldsRequired)
     .isLength({ min: 8 })
     .withMessage('Password must be at least 8 characters long')
     .matches(/\d/)
@@ -17,15 +18,12 @@ export const validateUserDatas = (requireUserRole = false) => [
     .withMessage('Password must contain an uppercase letter')
     .matches(/[^a-zA-Z0-9]/)
     .withMessage('Password must contain a special character'),
-  check('firstName').isLength({ min: 2 }),
-  check('lastName').isLength({ min: 2 }),
-  ...(requireUserRole
-    ? [
-        check('userRole')
-          .isIn(Object.values(UserRole))
-          .withMessage('Role is not valid'),
-      ]
-    : []),
+  check('firstName').optional(!allFieldsRequired).isLength({ min: 2 }),
+  check('lastName').optional(!allFieldsRequired).isLength({ min: 2 }),
+  check('userRole')
+    .optional(!allFieldsRequired)
+    .isIn(Object.values(UserRole))
+    .withMessage('Role is not valid'),
 
   (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
@@ -47,7 +45,7 @@ export const validateUserDatas = (requireUserRole = false) => [
     prisma.user
       .findUnique({ where: { email } })
       .then((user) => {
-        if (user) {
+        if (user && allFieldsRequired) {
           next(
             new ResponseError(
               400,

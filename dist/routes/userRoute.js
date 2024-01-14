@@ -19,7 +19,7 @@ router.get('/', (0, authorizeByRole_1.authorizeByRole)([User_1.UserRole.ADMIN]),
 // READ BY ID /user/:id
 router.get('/:id', (0, authorizeByRole_1.authorizeByRole)([User_1.UserRole.ADMIN]), userController_1.getUserById, (0, sendJsonResponse_1.sendJsonResponse)('user'));
 // UPDATE /user/:id
-router.patch('/:id', (0, validateUserDatas_1.validateUserDatas)(true), (0, authorizeByRole_1.authorizeByRole)([User_1.UserRole.ADMIN]), userController_1.updateUserById, (0, sendJsonResponse_1.sendJsonResponse)('user'));
+router.patch('/:id', (0, validateUserDatas_1.validateUserDatas)(false), (0, authorizeByRole_1.authorizeByRole)([User_1.UserRole.ADMIN]), userController_1.updateUserById, (0, sendJsonResponse_1.sendJsonResponse)('user'));
 // DELETE /user/:id
 router.delete('/:id', (0, authorizeByRole_1.authorizeByRole)([User_1.UserRole.ADMIN]), userController_1.deleteUserById, (0, sendJsonResponse_1.sendJsonResponse)('message'));
 exports.default = router;
